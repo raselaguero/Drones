@@ -50,3 +50,13 @@ class Medication(models.Model):
     class Meta:
        ordering = ['name']
 
+
+class SubscribeToHistory(models.Model):
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        ordering = ['email']
+

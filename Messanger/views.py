@@ -5,12 +5,28 @@ from rest_framework import status, filters
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from django.http import HttpResponse
 from datetime import datetime
-from .models import Drone, Medication
-from .serializers import DroneSerializer, MedicationSerializer, MedicationImageSerializer
+from .models import Drone, Medication, SubscribeToHistory
+from .serializers import DroneSerializer, MedicationSerializer, MedicationImageSerializer, SubscribeToHistorySerializer
 from celery import shared_task
 from Messanger.tasks import send_history_mail
 
 # Create your views here.
+
+class SubscribeToHistoryMixin(object):  #TODO: OK
+    queryset = SubscribeToHistory.objects.all()
+    serializer_class = SubscribeToHistorySerializer
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    search_fields = ('email',)
+    ordering_fields = ('email',)
+    ordering = ['email']
+
+
+class SubscribeToHistoryList(SubscribeToHistoryMixin, ListCreateAPIView):  #TODO: OK
+    pass
+
+
+class SubscribeToHistoryDetails(SubscribeToHistoryMixin, RetrieveUpdateDestroyAPIView):  #TODO: OK
+    pass
 
 
 class DroneMixin(object):  #TODO: OK
@@ -102,25 +118,6 @@ def battery_capacity(request, pk):
         level = '{}%'.format(dron.battery_capacity)
         dic = {dron.serial_number: level}
         return Response(dic)
-
-
-# @api_view(['GET'])  #TODO: en implementacion ------> falta la tarea programada
-# def drones_battery_capacity(request):
-#     if request.method == 'GET':
-#         try:
-#             drones = Drone.objects.all()
-#         except Drone.DoesNotExist:
-#             return HttpResponse(status=404)
-#         levels = [(d.serial_number, '{}%'.format(d.battery_capacity)) for d in drones]
-#         levels.append(('date-time', datetime.now()))
-#         return Response(dict(levels))
-
-
-@api_view(['POST'])  #TODO: en implementacion--------->
-def send_mail(request):
-    if request.method == 'POST':
-        send_history_mail(request.data['subject'], request.data['recipients'])
-        return Response({'message': 'Received'})
 
 
 @api_view(['GET'])  #TODO: OK

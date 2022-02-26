@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Drone, Medication
+from .models import Drone, Medication, SubscribeToHistory
 
 
 class MedicationSerializer(serializers.ModelSerializer):
@@ -25,3 +25,10 @@ class DroneSerializer(serializers.ModelSerializer):
         model = Drone
         fields = ['id', 'serial_number', 'model', 'weight_limit', 'battery_capacity', 'state', 'medications']
         read_only_fields = ('id',)
+
+
+class SubscribeToHistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubscribeToHistory
+        fields = ['email']
